@@ -1,10 +1,29 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Plus, Save, Trash2, Database } from 'lucide-react';
 
 const SUPABASE_URL = 'https://knsnjranmkgvxwoicssx.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtuc25qcmFubWtndnh3b2ljc3N4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY2MDQxNzYsImV4cCI6MjA4MjE4MDE3Nn0.4neEuF8ySDI7yJfMSfQUFyWwKb6oj_PkURMX9Lxts1Y';
 
-async function supabaseFetch(endpoint, options = {}) {
+interface Region {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+interface Entity {
+  id: number;
+  name: string;
+  description: string;
+  image_emoji: string;
+  region_id: number;
+  regions?: {
+    name: string;
+  };
+}
+
+async function supabaseFetch(endpoint: string, options: RequestInit = {}) {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
     ...options,
     headers: {
@@ -25,11 +44,11 @@ async function supabaseFetch(endpoint, options = {}) {
 }
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState('entities');
-  const [regions, setRegions] = useState([]);
-  const [entities, setEntities] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: '', text: '' });
+  const [activeTab, setActiveTab] = useState<string>('entities');
+  const [regions, setRegions] = useState<Region[]>([]);
+  const [entities, setEntities] = useState<Entity[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<{ type: string; text: string }>({ type: '', text: '' });
 
   const [entityForm, setEntityForm] = useState({
     name: '',
@@ -69,12 +88,12 @@ export default function AdminPanel() {
     }
   }
 
-  function showMessage(type, text) {
+  function showMessage(type: string, text: string) {
     setMessage({ type, text });
     setTimeout(() => setMessage({ type: '', text: '' }), 4000);
   }
 
-  function generateSlug(name) {
+  function generateSlug(name: string) {
     return name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -110,7 +129,7 @@ export default function AdminPanel() {
     }
   }
 
-  async function deleteEntity(id, name) {
+  async function deleteEntity(id: number, name: string) {
     if (!confirm(`Are you sure you want to delete "${name}"? This will also delete all associated fun facts and sightings.`)) {
       return;
     }
@@ -160,7 +179,7 @@ export default function AdminPanel() {
     }
   }
 
-  async function deleteRegion(id, name) {
+  async function deleteRegion(id: number, name: string) {
     const entityCount = entities.filter(e => e.region_id === id).length;
     
     if (entityCount > 0) {
