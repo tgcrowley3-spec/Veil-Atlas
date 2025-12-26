@@ -108,10 +108,13 @@ export default function AdminPanel() {
 
     try {
       setLoading(true);
+      const slug = generateSlug(entityForm.name);
+      
       await supabaseFetch('entities', {
         method: 'POST',
         body: JSON.stringify({
           name: entityForm.name,
+          slug: slug,
           description: entityForm.description,
           image_emoji: entityForm.image_emoji,
           region_id: parseInt(entityForm.region_id)
